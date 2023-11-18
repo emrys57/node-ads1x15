@@ -21,7 +21,8 @@
   "homepage": "https://github.com/alphacharlie/node-ads1x15",
   "dependencies": {
     "async": "^0.9.0",
-    "i2c": "^0.2.1"
+    "nan": "^2.18.0",
+    "i2c": "git+https://github.com/emrys57/node-i2c.git"
   },
   "devDependencies": {
     "chai": "^2.2.0",
