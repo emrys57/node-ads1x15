@@ -2,7 +2,7 @@
   "name": "node-ads1x15",
   "version": "1.0.3",
   "description": "Node module for the I2C ADS1x15 anaolg to digital converters to run on Raspberry Pi",
-  "main": "index.js",
+  "main": "test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,8 +21,9 @@
   "homepage": "https://github.com/alphacharlie/node-ads1x15",
   "dependencies": {
     "async": "^0.9.0",
+    "i2c": "github:emrys57/node-i2c",
     "nan": "^2.18.0",
-    "i2c": "git+https://github.com/emrys57/node-i2c.git"
+    "node-ads1x15": "^1.0.3"
   },
   "devDependencies": {
     "chai": "^2.2.0",
