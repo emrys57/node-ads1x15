@@ -1,7 +1,7 @@
-import {ads1x15} from './newCode.js';
+import {ADS1x15} from './newCode.js';
 
 const chip = 1; //0 for ads1015, 1 for ads1115
-const adc = new ads1x15(chip);
+const adc = new ADS1x15(chip);
 const channel = 0; //channel 0, 1, 2, or 3...
 const samplesPerSecond = '250'; // see index.js for allowed values for your chip
 const progGainAmp = '4096'; // see index.js for allowed values for your chip
