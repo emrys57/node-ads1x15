@@ -447,7 +447,7 @@ export class ADS1x15 {
   // _readConversion: This function reads the conversion result from the ADC.
   _readConversion = async () => {
     return new Promise((resolve, reject) => {
-      this.wire.readBytes(ADS1015_REG_POINTER_CONVERT, 2, function (err, res) {
+      this.wire.readBytes(ADS1015_REG_POINTER_CONVERT, 2, (err, res) => {
         if (err) {
           reject(new Error(`Read error: ${err}`));
         } else {
