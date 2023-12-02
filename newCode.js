@@ -389,7 +389,6 @@ export class ADS1x15 {
   _writeBytes(pointer, bytes) {
     return new Promise((resolve, reject) => {
       this.wire.writeBytes(pointer, bytes, function (err) {
-        this.busy = false;
         if (err) {
           reject(new Error(`Write error: ${err}`));
         } else {
@@ -449,7 +448,6 @@ export class ADS1x15 {
   async _readConversion() {
     return new Promise((resolve, reject) => {
       this.wire.readBytes(ADS1015_REG_POINTER_CONVERT, 2, function (err, res) {
-        this.busy = false;
         if (err) {
           reject(new Error(`Read error: ${err}`));
         } else {
