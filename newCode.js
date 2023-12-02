@@ -386,7 +386,7 @@ export class ADS1x15 {
   // private helper methods
 
   // Private method to write bytes
-  _writeBytes(pointer, bytes) {
+  _writeBytes = (pointer, bytes) => {
     return new Promise((resolve, reject) => {
       this.wire.writeBytes(pointer, bytes, function (err) {
         if (err) {
@@ -396,33 +396,33 @@ export class ADS1x15 {
         }
       });
     });
-  }
+  };
 
   //_getSPSConfig: This function takes the samples per second (SPS) as an argument
   // and returns the corresponding configuration value
   // from the spsADS1015 or spsADS1115 dictionary, depending on the ADC type (ADS1015 or ADS1115).
-  _getSPSConfig(sps) {
+  _getSPSConfig = (sps) => {
     const spsConfig = this.ic === IC_ADS1015 ? spsADS1015[sps] : spsADS1115[sps];
     if (!spsConfig) {
       throw new Error(`Invalid SPS specified: ${sps}`);
     }
     return spsConfig;
-  }
+  };
 
   // _getPGAConfig: This function takes the programmable gain amplifier (PGA) setting
   // as an argument and returns the corresponding configuration value
   // from the pgaADS1x15 dictionary.
-  _getPGAConfig(pga) {
+  _getPGAConfig = (pga) => {
     const pgaConfig = pgaADS1x15[Number(pga)];
     if (!pgaConfig) {
       throw new Error(`Invalid PGA specified: ${pga}`);
     }
     return pgaConfig;
-  }
+  };
 
   //_getChannelConfig: This function takes the channel number as an argument
   // and returns the corresponding configuration value for the ADC MUX setting.
-  _getChannelConfig(channel) {
+  _getChannelConfig = (channel) => {
     switch (channel) {
       case 0:
         return ADS1015_REG_CONFIG_MUX_SINGLE_0;
@@ -435,17 +435,17 @@ export class ADS1x15 {
       default:
         throw new Error(`Invalid channel specified: ${channel}`);
     }
-  }
+  };
 
   //_writeConfig: This function takes the configuration value, converts it to bytes,
   // and writes it to the ADC configuration register.
-  async _writeConfig(config) {
+  _writeConfig = async (config) => {
     const bytes = [(config >> 8) & 0xff, config & 0xff];
     await this._writeBytes(ADS1015_REG_POINTER_CONFIG, bytes);
-  }
+  };
 
   // _readConversion: This function reads the conversion result from the ADC.
-  async _readConversion() {
+  _readConversion = async () => {
     return new Promise((resolve, reject) => {
       this.wire.readBytes(ADS1015_REG_POINTER_CONVERT, 2, function (err, res) {
         if (err) {
@@ -464,17 +464,17 @@ export class ADS1x15 {
         }
       });
     });
-  }
+  };
 
-  async _writeThreshold(pointer, threshold) {
+  _writeThreshold = async (pointer, threshold) => {
     // Convert the threshold value to bytes
     const thresholdWord = this.ic === IC_ADS1015 ? Math.round(threshold * (2048.0 / this.pga)) : Math.round(threshold * (32767.0 / this.pga));
 
     const bytes = [(thresholdWord >> 8) & 0xff, thresholdWord & 0xff];
     await this._writeBytes(pointer, bytes);
-  }
+  };
 
-  _getDifferentialChannelConfig(chP, chN) {
+  _getDifferentialChannelConfig = (chP, chN) => {
     if (chP === 0 && chN === 1) {
       return ADS1015_REG_CONFIG_MUX_DIFF_0_1;
     }
@@ -488,5 +488,5 @@ export class ADS1x15 {
       return ADS1015_REG_CONFIG_MUX_DIFF_2_3;
     }
     throw new Error(`Invalid differential channel pair: ${chP}, ${chN}`);
-  }
+  };
 }
