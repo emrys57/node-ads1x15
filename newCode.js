@@ -130,15 +130,6 @@ export class ADS1x15 {
     this.busy = false;
   }
 
-  // Private method to write bytes
-  async _writeBytes(pointer, bytes) {
-    try {
-      await this.wire.writeBytes(pointer, bytes);
-    } catch (err) {
-      throw new Error(`Write error: ${err}`);
-    }
-  }
-
   // Gets a single-ended ADC reading from the specified channel in mV. \
   // The sample rate for this mode (single-shot) can be used to lower the noise \
   // (low sps) or to lower the power consumption (high sps) by duty cycling, \
@@ -394,6 +385,20 @@ export class ADS1x15 {
 
   // private helper methods
 
+  // Private method to write bytes
+  _writeBytes(pointer, bytes) {
+    return new Promise((resolve, reject) => {
+      this.wire.writeBytes(pointer, bytes, function (err) {
+        this.busy = false;
+        if (err) {
+          reject(new Error(`Write error: ${err}`));
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
   //_getSPSConfig: This function takes the samples per second (SPS) as an argument
   // and returns the corresponding configuration value
   // from the spsADS1015 or spsADS1115 dictionary, depending on the ADC type (ADS1015 or ADS1115).
@@ -442,15 +447,25 @@ export class ADS1x15 {
 
   // _readConversion: This function reads the conversion result from the ADC.
   async _readConversion() {
-    const res = await this.wire.readBytes(ADS1015_REG_POINTER_CONVERT, 2);
-    if (this.ic === IC_ADS1015) {
-      // Shift right 4 bits for the 12-bit ADS1015 and convert to mV
-      return ((((res[0] << 8) | (res[1] & 0xff)) >> 4) * this.pga) / 2048.0;
-    } else {
-      // Convert 16-bit ADS1115 value to mV
-      const val = (res[0] << 8) | res[1];
-      return val > 0x7fff ? ((val - 0xffff) * this.pga) / 32768.0 : (val * this.pga) / 32768.0;
-    }
+    return new Promise((resolve, reject) => {
+      this.wire.readBytes(ADS1015_REG_POINTER_CONVERT, 2, function (err, res) {
+        this.busy = false;
+        if (err) {
+          reject(new Error(`Read error: ${err}`));
+        } else {
+          let result;
+          if (this.ic === IC_ADS1015) {
+            // Process the result for ADS1015
+            result = ((((res[0] << 8) | (res[1] & 0xff)) >> 4) * this.pga) / 2048.0;
+          } else {
+            // Process the result for ADS1115
+            const val = (res[0] << 8) | res[1];
+            result = val > 0x7fff ? ((val - 0xffff) * this.pga) / 32768.0 : (val * this.pga) / 32768.0;
+          }
+          resolve(result);
+        }
+      });
+    });
   }
 
   async _writeThreshold(pointer, threshold) {
