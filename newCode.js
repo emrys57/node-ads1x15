@@ -147,7 +147,7 @@ export class ADS1x15 {
 
   // Method to read ADC Single Ended
 
-  async promiseToReadADCSingleEnded(channel = 0, pga = 6144, sps = 250) {
+  async promiseToReadADCSingleEnded({channel = 0, pga = 6144, sps = 250}) {
     if (this.busy) {
       throw new Error('ADC is busy');
     }
@@ -196,7 +196,7 @@ export class ADS1x15 {
   // and samples per second (SPS), and then start the conversion.
   //    The method first checks if the ADC is busy. If so, it throws an error.
 
-  async startContinuousConversion(channel = 0, pga = 6144, sps = 250) {
+  async promiseToStartContinuousConversion({channel = 0, pga = 6144, sps = 250}) {
     if (this.busy) {
       throw new Error('ADC is busy');
     }
@@ -238,7 +238,7 @@ export class ADS1x15 {
   // The stopContinuousConversion method in the ADS1x15 class is used
   // to stop the ADC's continuous conversion mode
   // and reset its configuration to a default or power-off state.
-  async stopContinuousConversion() {
+  async PromiseToStopContinuousConversion() {
     if (this.busy) {
       throw new Error('ADC is busy');
     }
@@ -262,7 +262,7 @@ export class ADS1x15 {
   //The getLastConversionResults method in the ADS1x15 class
   // is used to retrieve the most recent conversion result
   // from the ADC, especially useful in continuous conversion mode.
-  async getLastConversionResults() {
+  async promiseToGetLastConversionResults() {
     if (this.busy) {
       throw new Error('ADC is currently busy with another operation');
     }
@@ -285,7 +285,7 @@ export class ADS1x15 {
   // This mode allows the device to generate an alert when the ADC value exceeds
   // a specified high threshold or falls below a specified low threshold.
 
-  async startSingleEndedComparator(channel, thresholdHigh, thresholdLow, pga = 6144, sps = 250, activeLow = true, traditionalMode = true, latching = false, numReadings = 1) {
+  async promiseToStartSingleEndedComparator({channel, thresholdHigh, thresholdLow, pga = 6144, sps = 250, activeLow = true, traditionalMode = true, latching = false, numReadings = 1}) {
     if (this.busy) {
       throw new Error('ADC is busy');
     }
@@ -343,7 +343,7 @@ export class ADS1x15 {
   // to start the comparator mode on specified differential channels.
   // This mode allows the device to generate an alert when the differential ADC value
   // exceeds a specified high threshold or falls below a specified low threshold.
-  async startDifferentialComparator(chP, chN, thresholdHigh, thresholdLow, pga = 6144, sps = 250, activeLow = true, traditionalMode = true, latching = false, numReadings = 1) {
+  async promiseToStartDifferentialComparator({chP, chN, thresholdHigh, thresholdLow, pga = 6144, sps = 250, activeLow = true, traditionalMode = true, latching = false, numReadings = 1}) {
     if (this.busy) {
       throw new Error('ADC is busy');
     }
@@ -409,7 +409,7 @@ export class ADS1x15 {
   // as an argument and returns the corresponding configuration value
   // from the pgaADS1x15 dictionary.
   _getPGAConfig(pga) {
-    const pgaConfig = pgaADS1x15[pga];
+    const pgaConfig = pgaADS1x15[Number(pga)];
     if (!pgaConfig) {
       throw new Error(`Invalid PGA specified: ${pga}`);
     }
