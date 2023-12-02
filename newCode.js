@@ -118,7 +118,7 @@ const pgaADS1x15 = {
 };
 
 // ADS1x15 Class
-class ADS1x15 {
+export class ADS1x15 {
   constructor(ic = IC_ADS1015, address = 0x48, i2cDev = '/dev/i2c-1') {
     if (!(ic === IC_ADS1015 || ic === IC_ADS1115)) {
       throw new Error('Not a supported device');
@@ -147,7 +147,7 @@ class ADS1x15 {
 
   // Method to read ADC Single Ended
 
-  async readADCSingleEnded(channel = 0, pga = 6144, sps = 250) {
+  async promiseToReadADCSingleEnded(channel = 0, pga = 6144, sps = 250) {
     if (this.busy) {
       throw new Error('ADC is busy');
     }
@@ -477,5 +477,3 @@ class ADS1x15 {
     throw new Error(`Invalid differential channel pair: ${chP}, ${chN}`);
   }
 }
-
-export default ADS1x15;
