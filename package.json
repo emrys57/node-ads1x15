@@ -24,7 +24,8 @@
     "async": "^0.9.0",
     "i2c": "github:emrys57/node-i2c",
     "nan": "^2.18.0",
-    "node-ads1x15": "^1.0.3"
+    "node-ads1x15": "^1.0.3",
+    "ws": "^8.14.2"
   },
   "devDependencies": {
     "chai": "^2.2.0",

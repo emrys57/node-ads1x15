@@ -1,4 +1,15 @@
 import {ADS1x15} from './newCode.js';
+import {WebSocket} from 'ws';
+const wss = new WebSocket.Server({port: 8080});
+let connected = false;
+wss.on('connection', (ws) => {
+  console.log('connection');
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
+  //   ws.send('something');
+  connected = true;
+});
 
 class ADCSampler {
   constructor(adc, channel, pga, sps, interval = 200, maxReadings = 1000) {
@@ -21,8 +32,9 @@ class ADCSampler {
     this.timer = setInterval(async () => {
       if (!this.adc.busy) {
         try {
-          const data = await this.adc.promiseToReadADCSingleEnded({channel: this.channel, pga: this.pga, sps: this.sps});
-          this.addReading(data);
+          const reading = await this.adc.promiseToReadADCSingleEnded({channel: this.channel, pga: this.pga, sps: this.sps});
+          const time = Date.now();
+          this.addReading({time, reading});
         } catch (error) {
           console.error('Error during ADC reading:', error);
         }
@@ -39,12 +51,19 @@ class ADCSampler {
     }
   }
 
-  addReading(reading) {
-    if (this.readings.length >= this.maxReadings) {
-      this.readings.shift(); // Remove the oldest reading
+  addReading(data) {
+    // if (this.readings.length >= this.maxReadings) {
+    //   this.readings.shift(); // Remove the oldest reading
+    // }
+    // this.readings.push(reading); // Add the new reading
+    if (connected) {
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(data));
+        }
+      });
     }
-    this.readings.push(reading); // Add the new reading
-    console.log(this._formatNumber(reading));
+    console.log(this._formatNumber(data?.reading));
   }
 
   getReadings() {
