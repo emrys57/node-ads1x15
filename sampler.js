@@ -12,13 +12,15 @@ let connected = false;
 // });
 
 let WebSocket;
+let wss;
 
 async function setupWebSocket() {
   if (!WebSocket) {
-    WebSocket = await import('ws');
+    const wsModule = await import('ws');
+    WebSocket = wsModule.default || wsModule;
   }
 
-  const wss = new WebSocket.Server({port: 8080});
+  wss = new WebSocket.Server({port: 8080});
   wss.on('connection', function connection(ws) {
     console.log('Client connected');
     ws.on('message', function incoming(message) {
