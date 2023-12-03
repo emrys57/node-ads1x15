@@ -1,37 +1,17 @@
 import {ADS1x15} from './newCode.js';
-// import {WebSocket} from 'ws';
-// const wss = new WebSocket.Server({port: 8080});
+import {WebSocketServer} from 'ws';
+
+const wss = new WebSocketServer({port: 8080});
 let connected = false;
-// wss.on('connection', (ws) => {
-//   console.log('connection');
-//   ws.on('message', function incoming(message) {
-//     console.log('received: %s', message);
-//   });
-//   //   ws.send('something');
-//   connected = true;
-// });
 
-let WebSocket;
-let wss;
-
-async function setupWebSocket() {
-  if (!WebSocket) {
-    const wsModule = await import('ws');
-    WebSocket = wsModule.default || wsModule;
-  }
-
-  wss = new WebSocket.Server({port: 8080});
-  wss.on('connection', function connection(ws) {
-    console.log('Client connected');
-    ws.on('message', function incoming(message) {
-      console.log('received: %s', message);
-    });
-    // Your WebSocket handling code here
-    connected = true;
+wss.on('connection', function connection(ws) {
+  console.log('Client connected');
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
   });
-}
-
-setupWebSocket();
+  // Your WebSocket handling code here
+  connected = true;
+});
 
 class ADCSampler {
   constructor(adc, channel, pga, sps, interval = 200, maxReadings = 1000) {
