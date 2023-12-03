@@ -60,6 +60,7 @@ class ADCSampler {
     // this.readings.push(reading); // Add the new reading
     if (connected) {
       wss.clients.forEach((client) => {
+        console.log(`readyState: ${client.readyState}`);
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(data));
         }
