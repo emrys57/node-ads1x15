@@ -110,7 +110,7 @@ const spsADS1015 = {
 
 const pgaADS1x15 = {
   6144: ADS1015_REG_CONFIG_PGA_6_144V,
-  4096: ADS1015_REG_CONFIG_PGA_4_096V,
+  4096: ADS1015_REG_CONFIG_PGA_4_096V, // This means the input range is -4.096 V to 4.096 V
   2048: ADS1015_REG_CONFIG_PGA_2_048V,
   1024: ADS1015_REG_CONFIG_PGA_1_024V,
   512: ADS1015_REG_CONFIG_PGA_0_512V,
@@ -143,6 +143,8 @@ export class ADS1x15 {
       throw new Error('ADC is busy');
     }
     this.busy = true;
+
+    this.pga = pga; // Not at all sure this is good practice. Should we have a separate method to set pga?
 
     try {
       // Ensure the channel is valid
@@ -192,6 +194,8 @@ export class ADS1x15 {
       throw new Error('ADC is busy');
     }
     this.busy = true;
+
+    this.pga = pga; // Not at all sure this is good practice. Should we have a separate method to set pga?
 
     try {
       // Validate the channel
@@ -282,6 +286,8 @@ export class ADS1x15 {
     }
     this.busy = true;
 
+    this.pga = pga; // Not at all sure this is good practice. Should we have a separate method to set pga?
+
     try {
       // Validate the channel
       if (channel < 0 || channel > 3) {
@@ -340,6 +346,7 @@ export class ADS1x15 {
     }
     this.busy = true;
 
+    this.pga = pga; // Not at all sure this is good practice. Should we have a separate method to set pga?
     try {
       // Configure the comparator mode
       let config =
