@@ -410,7 +410,7 @@ export class ADS1x15 {
   // from the spsADS1015 or spsADS1115 dictionary, depending on the ADC type (ADS1015 or ADS1115).
   _getSPSConfig = (sps) => {
     const spsConfig = this.ic === IC_ADS1015 ? spsADS1015[sps] : spsADS1115[sps];
-    if (!spsConfig) {
+    if (spsConfig === undefined) {
       throw new Error(`Invalid SPS specified: ${sps}`);
     }
     return spsConfig;
@@ -421,7 +421,7 @@ export class ADS1x15 {
   // from the pgaADS1x15 dictionary.
   _getPGAConfig = (pga) => {
     const pgaConfig = pgaADS1x15[Number(pga)];
-    if (!pgaConfig) {
+    if (pgaConfig === undefined) {
       throw new Error(`Invalid PGA specified: ${pga}`);
     }
     return pgaConfig;
