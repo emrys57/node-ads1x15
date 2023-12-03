@@ -6,9 +6,14 @@ let connected = false;
 
 wss.on('connection', function connection(ws) {
   console.log('Client connected');
-  ws.on('message', function incoming(message) {
+  ws.on('message', (message) => {
     console.log('received: %s', message);
   });
+  ws.on('close', () => {
+    console.log('Client disconnected');
+    connected = false;
+  });
+  ws.on('error', console.error);
   // Your WebSocket handling code here
   connected = true;
 });
@@ -63,10 +68,10 @@ class ADCSampler {
         if (client.readyState === 1) {
           // This is WebSocket.OPEN
           client.send(JSON.stringify(data));
+          console.log(this._formatNumber(data?.reading), 'sent');
         }
       });
     }
-    console.log(this._formatNumber(data?.reading));
   }
 
   getReadings() {
