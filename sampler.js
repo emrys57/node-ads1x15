@@ -2,9 +2,9 @@ import {ADS1x15} from './newCode.js';
 import {WebSocketServer} from 'ws';
 
 class ADCSampler {
-  constructor(adc, channel, pga, sps, interval = 200, maxReadings = 2000) {
+  constructor(adc, channels, pga, sps, interval = 200, maxReadings = 5000) {
     this.adc = adc;
-    this.channel = channel;
+    this.channels = channels;
     this.pga = pga;
     this.sps = sps;
     this.interval = interval;
@@ -22,9 +22,11 @@ class ADCSampler {
     this.timer = setInterval(async () => {
       if (!this.adc.busy) {
         try {
-          const reading = await this.adc.promiseToReadADCSingleEnded({channel: this.channel, pga: this.pga, sps: this.sps});
-          const time = Date.now();
-          this.addReading({channel, time, reading});
+          for (const channel of channel) {
+            const time = Date.now();
+            const reading = await this.adc.promiseToReadADCSingleEnded({channel: this.channel, pga: this.pga, sps: this.sps});
+            this.addReading({channel, time, reading});
+          }
         } catch (error) {
           console.error('Error during ADC reading:', error);
         }
@@ -74,12 +76,12 @@ class ADCSampler {
 }
 
 const adc = new ADS1x15(1);
-const channel = 0;
+const channels = [0, 1];
 const pga = 4096;
-const sps = 8;
+const sps = 32;
 
 // Example usage
-const adcSampler = new ADCSampler(adc, channel, pga, sps);
+const adcSampler = new ADCSampler(adc, channels, pga, sps);
 adcSampler.startSampling();
 
 // To stop sampling, call adcSampler.stopSampling();
