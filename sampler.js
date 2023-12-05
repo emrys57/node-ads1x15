@@ -1,25 +1,8 @@
 import {ADS1x15} from './newCode.js';
 import {WebSocketServer} from 'ws';
 
-const wss = new WebSocketServer({port: 8080});
-let connected = false;
-
-wss.on('connection', function connection(ws) {
-  console.log('Client connected');
-  ws.on('message', (message) => {
-    console.log('received: %s', message);
-  });
-  ws.on('close', () => {
-    console.log('Client disconnected');
-    connected = false;
-  });
-  ws.on('error', console.error);
-  // Your WebSocket handling code here
-  connected = true;
-});
-
 class ADCSampler {
-  constructor(adc, channel, pga, sps, interval = 200, maxReadings = 1000) {
+  constructor(adc, channel, pga, sps, interval = 200, maxReadings = 2000) {
     this.adc = adc;
     this.channel = channel;
     this.pga = pga;
@@ -41,7 +24,7 @@ class ADCSampler {
         try {
           const reading = await this.adc.promiseToReadADCSingleEnded({channel: this.channel, pga: this.pga, sps: this.sps});
           const time = Date.now();
-          this.addReading({time, reading});
+          this.addReading({channel, time, reading});
         } catch (error) {
           console.error('Error during ADC reading:', error);
         }
@@ -59,19 +42,17 @@ class ADCSampler {
   }
 
   addReading(data) {
-    // if (this.readings.length >= this.maxReadings) {
-    //   this.readings.shift(); // Remove the oldest reading
-    // }
-    // this.readings.push(reading); // Add the new reading
-    if (connected) {
-      wss.clients.forEach((client) => {
-        if (client.readyState === 1) {
-          // This is WebSocket.OPEN
-          client.send(JSON.stringify(data));
-          console.log(this._formatNumber(data?.reading), 'sent');
-        }
-      });
+    if (this.readings.length >= this.maxReadings) {
+      this.readings.shift(); // Remove the oldest reading
     }
+    this.readings.push(data); // Add the new reading
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) {
+        // This is WebSocket.OPEN
+        client.send(JSON.stringify(data));
+        console.log(this._formatNumber(data?.reading), 'sent');
+      }
+    });
   }
 
   getReadings() {
@@ -103,3 +84,22 @@ adcSampler.startSampling();
 
 // To stop sampling, call adcSampler.stopSampling();
 // To get the readings, call adcSampler.getReadings();
+
+const wss = new WebSocketServer({port: 8080});
+
+wss.on('connection', function connection(ws) {
+  console.log('Client connected');
+  const readings = adcSampler.getReadings();
+  if (readings.length > 0) {
+    // Send all the readings we have when a client connects so they can draw the chart
+    ws.send(JSON.stringify(readings));
+  }
+  ws.on('message', (message) => {
+    console.log('received: %s', message);
+  });
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+  ws.on('error', console.error);
+  // Your WebSocket handling code here
+});
