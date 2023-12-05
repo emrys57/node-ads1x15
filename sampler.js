@@ -24,7 +24,7 @@ class ADCSampler {
         try {
           for (const channel of this.channels) {
             const time = Date.now();
-            const reading = await this.adc.promiseToReadADCSingleEnded({channel: this.channel, pga: this.pga, sps: this.sps});
+            const reading = await this.adc.promiseToReadADCSingleEnded({channel, pga: this.pga, sps: this.sps});
             this.addReading({channel, time, reading});
           }
         } catch (error) {
